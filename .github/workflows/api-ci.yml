@@ -29,7 +29,7 @@ jobs:
                                   pkg-config autoconf automake libtool
 
       - name: Instalar CLIs globales
-        run: npm i -g ts-node @stoplight/spectral-cli insomnia-inso
+        run: npm i -g insomnia-inso@3.8.1
 
       - name: Instalar dependencias del proyecto
         run: npm ci
