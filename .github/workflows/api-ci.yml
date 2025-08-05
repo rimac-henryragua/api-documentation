@@ -1,57 +1,23 @@
-name: API CI & Insomnia export
-
-on:
-  push:
-    branches: [dev, main]     # ajusta a tus ramas protegidas
-  pull_request:
-    branches: [dev, main]
+name: Test API (Manual Installation)
+on: [push]
 
 jobs:
-  openapi-ci:
+  validate-and-test:
     runs-on: ubuntu-latest
-
     steps:
-      # 1️⃣  Traer el código
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      # 2️⃣  Preparar Node + dependencias CLI (ts-node, Spectral, Inso)
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 18.x # O la versión que necesites
 
-      # 👉 Deps para compilar node-libcurl
-      - name: Build deps for node-libcurl
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential python3 libcurl4-openssl-dev \
-                                  pkg-config autoconf automake libtool
+      - name: Install Inso CLI
+        run: npm install -g insomnia-inso
 
-      - name: Instalar CLIs globales
-        run: npm i -g insomnia-inso@3.8.1
+      - name: Lint API spec
+        run: inso lint spec "My API Spec" --ci
 
-      - name: Instalar dependencias del proyecto
-        run: npm ci
-
-      # 3️⃣  Generar openapi.yaml desde los controladores Nest JS
-      #     Asume que tienes scripts/generate-openapi.ts (ver más abajo)
-      - name: Generar OpenAPI a partir del código
-        run: npm run gen:api              # crea openapi.yaml en la raíz
-
-      # 4️⃣  Lint (sintaxis y estilo) del contrato
-      - name: Lint OpenAPI
-        run: npm run lint-api             # alias: spectral lint openapi.yaml
-
-      # 5️⃣  Exportar los esquemas de endpoints a Insomnia (.insomnia/)
-      - name: Exportar colección Insomnia
-        run: |
-          mkdir -p .insomnia
-          inso export spec openapi.yaml --output .insomnia/api.json
-
-      # 6️⃣  (Opcional) Guardar artefacto para inspección o downstream jobs
-      - name: Subir artefactos
-        uses: actions/upload-artifact@v4
-        with:
-          name: insomnia-collection
-          path: .insomnia/api.json
+      - name: Run API tests
+        run: inso run test "My Test Suite" --ci
