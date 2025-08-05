@@ -1,0 +1,51 @@
+name: API CI & Insomnia export
+
+on:
+  push:
+    branches: [dev, main]     # ajusta a tus ramas protegidas
+  pull_request:
+    branches: [dev, main]
+
+jobs:
+  openapi-ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣  Traer el código
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2️⃣  Preparar Node + dependencias CLI (ts-node, Spectral, Inso)
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Instalar CLIs globales
+        run: |
+          npm i -g ts-node @stoplight/spectral-cli insomnia-inso
+
+      - name: Instalar dependencias del proyecto
+        run: npm ci
+
+      # 3️⃣  Generar openapi.yaml desde los controladores Nest JS
+      #     Asume que tienes scripts/generate-openapi.ts (ver más abajo)
+      - name: Generar OpenAPI a partir del código
+        run: npm run gen:api              # crea openapi.yaml en la raíz
+
+      # 4️⃣  Lint (sintaxis y estilo) del contrato
+      - name: Lint OpenAPI
+        run: npm run lint-api             # alias: spectral lint openapi.yaml
+
+      # 5️⃣  Exportar los esquemas de endpoints a Insomnia (.insomnia/)
+      - name: Exportar colección Insomnia
+        run: |
+          mkdir -p .insomnia
+          inso export spec openapi.yaml --output .insomnia/api.json
+
+      # 6️⃣  (Opcional) Guardar artefacto para inspección o downstream jobs
+      - name: Subir artefactos
+        uses: actions/upload-artifact@v4
+        with:
+          name: insomnia-collection
+          path: .insomnia/api.json
