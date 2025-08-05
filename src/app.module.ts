@@ -1,11 +1,23 @@
 import { Module } from '@nestjs/common';
+import { DataSource } from 'typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { SqliteTypeormClient } from './shared/infrastructure/persistence/typeorm/SqliteTypeormClient';
 import { UserModule } from './user/infraestructure/user.module';
+import { AllExceptionsFilter } from './shared/infrastructure/all-exceptions.filter';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
-  imports: [UserModule],
+  imports: [UserModule, SqliteTypeormClient.create()],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private dataSource: DataSource) {}
+}
