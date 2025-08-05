@@ -19,11 +19,17 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+
+      # 👉 Deps para compilar node-libcurl
+      - name: Build deps for node-libcurl
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential python3 libcurl4-openssl-dev \
+                                  pkg-config autoconf automake libtool
 
       - name: Instalar CLIs globales
-        run: |
-          npm i -g ts-node @stoplight/spectral-cli insomnia-inso
+        run: npm i -g ts-node @stoplight/spectral-cli insomnia-inso
 
       - name: Instalar dependencias del proyecto
         run: npm ci
