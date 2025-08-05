@@ -21,8 +21,19 @@ jobs:
       - name: Install Inso CLI
         run: npm install -g insomnia-inso
 
-      - name: Lint API spec
-        run: inso lint spec "My API Spec" --ci
+      - name: Instalar dependencias del proyecto
+        run: npm ci
 
-      - name: Run API tests
-        run: inso run test "My Test Suite" --ci
+      # 3️⃣  Generar openapi.yaml  ← aquí el script NestJS
+      - name: Generar OpenAPI a partir del código
+        run: ts-node scripts/generate-openapi.ts
+
+      # 4️⃣  Lint
+      - name: Lint OpenAPI
+        run: spectral lint openapi.yaml
+
+      # 5️⃣  Exportar colección Insomnia
+      - name: Exportar colección Insomnia
+        run: |
+          mkdir -p .insomnia
+          inso export spec openapi.yaml --output .insomnia/api.json
