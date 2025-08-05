@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
 import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { UserCreator } from 'src/user/application/user-creator/UserCreator';
+import { UserCreator } from '../application/user-creator/UserCreator';
 import { GetAllUsers } from '../application/get-all-users/GetAllUsers';
 import { CreateUserDto } from './dto/create-user.dto';
 import { FindAllUserResponseDto } from './dto/find-all-user-response.dto';
