@@ -19,7 +19,7 @@ jobs:
           sudo apt-get install -y build-essential libcurl4-openssl-dev
 
       - name: Install Inso CLI
-        run: npm install -g insomnia-inso@3.8.1 ts-node @stoplight/spectral-cli
+        run: npm install -g insomnia-inso ts-node @stoplight/spectral-cli
 
       - name: Instalar dependencias del proyecto
         run: npm ci
