@@ -1,5 +1,10 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiCreatedResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiCreatedResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UserCreator } from '../application/user-creator/UserCreator';
 import { GetAllUsers } from '../application/get-all-users/GetAllUsers';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -15,6 +20,10 @@ export class UserController {
   ) {}
 
   @Post()
+  @ApiOperation({
+    summary: 'Create a new User',
+    description: 'Insert a new User on the System',
+  })
   @ApiCreatedResponse({
     description: 'The record has been successfully created.',
   })
